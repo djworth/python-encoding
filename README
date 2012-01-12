@@ -4,7 +4,7 @@ This is still a work in progress but what has been implemented should work.
 
 Example usage:
 
-'''python
+
 import encoding
 
 ENCODING_USERID = '1234'
@@ -35,4 +35,3 @@ response = encoder.add_media(source=[MEDIA_IN_S3], formats=[FORMAT])
 
 print response
 
-'''
