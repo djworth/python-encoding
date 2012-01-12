@@ -8,7 +8,7 @@ Example usage:
 import encoding
 
 ENCODING_USERID = '1234'
-ENC0DING_USERKEY = 'ABC123'
+ENCODING_USERKEY = 'ABC123'
 
 
 MEDIA_IN_S3 = 's3://<aws_access_key>:<aws_secret>@s3.amazonaws.com/<bucket_name>/<key>'
