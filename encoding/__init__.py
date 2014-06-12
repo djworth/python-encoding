@@ -1,17 +1,111 @@
-import httplib, urllib
-from lxml import etree
+#!/usr/bin/env python
 
-ENCODING_API_URL = 'manage.encoding.com:80'
+import httplib
+import urllib
+import os
+import requests
+import json
+import lxml
+
+ENCODING_API_REQUEST_TYPE = 'query'
+ENCODING_API_HOST = 'manage.encoding.com'
+ENCODING_API_PORT = '80'
+ENCODING_API_URL_TEMPLATE = 'http://{}:{}'
+ENCODING_API_HEADERS = { 
+                        'Content-Type':'application/x-www-form-urlencoded',
+                       }
+
+def build_url(host=None,
+              port=None):
+
+    url_host = host or ENCODING_API_HOST
+    url_port = port or ENCODING_API_PORT
+
+    return ENCODING_API_URL_TEMPLATE.format(url_host,
+                                            url_port)
+
+
+class XmlRequest(object):
+
+    def __init__(self,
+                 request_type=ENCODING_API_REQUEST_TYPE):
+ 
+        self.request = lxml.etree.Element(request_type)
+
+    @property
+    def query(self):
+        return self.request
+
+    def prepare_request(self,
+                        data=None):
+
+        return self._build(data=data)
+
+    def build(self, 
+              data=None):
+        
+        if data is not None:
+
+            for k,v in data.items():
+                if isinstance(v, list):
+                    for item in v:
+                        element = lxml.etree.Element(k)
+                        element.text = item
+                        self.request.append(element)
+                else:
+                    element = lxml.etree.Element(k)
+                    element.text = v
+                    self.request.append(element)
+
+        return self.request
+
+    def append(self,
+               node_name=None,
+               node_value=None):
+
+        if all([
+               node_name is not None,
+               node_value is not None,
+               ]):
+
+            new_node = lxml.etree.Element(node_name)
+            new_node.text = node_value
+            self.request.append(new_node)
+
+    @staticmethod
+    def parse(self, 
+              source=None):
+
+        result = None
+
+        if source is not None:
+            result = lxml.etree.fromstring(source)
+
+        return result 
+
+class JsonRequest(object):
+
+    def __init__(self):
+
+        self.request = {}
 
 class Encoding(object):
     
-    def __init__(self, userid, userkey, url=ENCODING_API_URL):
-        self.url = url
+    def __init__(self, 
+                 userid=None, 
+                 userkey=None, 
+                 url=None):
+
+        self.url = url or build_url()
         self.userid = userid
         self.userkey = userkey
 
-    def get_media_info(self, action='GetMediaInfo', ids=[], headers={'Content-Type':'application/x-www-form-urlencoded'}):
-        query = etree.Element('query')
+    def get_media_info(self, 
+                       action='GetMediaInfo', 
+                       ids=None, 
+                       headers=ENCODING_API_HEADERS):
+
+        xml_request = XmlRequest()
 
         nodes = {   'userid':self.userid,
                     'userkey':self.userkey,
@@ -19,14 +113,20 @@ class Encoding(object):
                     'mediaid':','.join(ids),
                     }
 
-        query = self._build_tree(etree.Element('query'), nodes) 
+        xml_request.build(nodes) 
         
-        results = self._execute_request(query, headers)
+        results = self._execute_request(xml_request.query, 
+                                        headers)
 
-        return self._parse_results(results)
+        return XmlRequest.parse(results)
 
-    def get_status(self, action='GetStatus', ids=[], extended='no', headers={'Content-Type':'application/x-www-form-urlencoded'}):
-        query = etree.Element('query')
+    def get_status(self, 
+                   action='GetStatus', 
+                   ids=None, 
+                   extended='no', 
+                   headers=ENCODING_API_HEADERS):
+
+        xml_request = XmlRequest()
 
         nodes = {   'userid':self.userid,
                     'userkey':self.userkey,
@@ -35,15 +135,22 @@ class Encoding(object):
                     'mediaid':','.join(ids),
                     }
 
-        query = self._build_tree(etree.Element('query'), nodes) 
+        xml_request.build(nodes) 
         
-        results = self._execute_request(query, headers)
+        results = self._execute_request(xml_request.query, 
+                                        headers)
 
-        return self._parse_results(results)
+        return XmlRequest.parse(results)
 
-    def add_media(self, action='AddMedia', source=[], notify='', formats=[], instant='no', headers={'Content-Type':'application/x-www-form-urlencoded'}):
+    def add_media(self, 
+                  action='AddMedia', 
+                  source=None, 
+                  notify='', 
+                  formats=None,
+                  instant='no', 
+                  headers=ENCODING_API_HEADERS):
 
-        query = etree.Element('query')
+        xml_request = XmlRequest()
 
         nodes = {   'userid':self.userid,
                     'userkey':self.userkey,
@@ -53,34 +160,21 @@ class Encoding(object):
                     'instant':instant,
                     }
 
-        query = self._build_tree(etree.Element('query'), nodes) 
+        xml_request.build(nodes) 
         
-        for format in formats:
-            format_node = self._build_tree(etree.Element('format'), format) 
-            query.append(format_node)
+        for format_entry in formats:
 
-        results = self._execute_request(query, headers)
+            xml_request.append('format',
+                               format_entry)
+
+        results = self._execute_request(xml_request.query, 
+                                        headers)
 
         return self._parse_results(results)
 
-    def _build_tree(self, node, data):
-        
-        for k,v in data.items():
-            if isinstance(v, list):
-                for item in v:
-                    element = etree.Element(k)
-                    element.text = item
-                    node.append(element)
-            else:
-                element = etree.Element(k)
-                element.text = v
-                node.append(element)
-
-        return node
-
     def _execute_request(self, xml, headers, path='', method='POST'):
 
-        params = urllib.urlencode({'xml':etree.tostring(xml)})
+        params = urllib.urlencode({'xml':lxml.etree.tostring(xml)})
 
         conn = httplib.HTTPConnection(self.url)
         conn.request(method, path, params, headers)
@@ -89,6 +183,3 @@ class Encoding(object):
         conn.close()
 
         return data
-
-    def _parse_results(self, results):
-        return etree.fromstring(results)
