@@ -137,6 +137,22 @@ class Encoding(object):
 
         return result
 
+    def transcode_asset(self,
+                        transcode_job=None,
+                        headers=constants.ENCODING_API_HEADERS):
+        result = None
+
+        if self.request_object is not None:
+
+            self.request_object.build(transcode_job) 
+        
+            results = self._execute_request(request_obj=self.request_object, 
+                                            headers=headers)
+            if results is not None:
+                result = self.request_class.parse(results)
+
+        return result
+
     def _execute_request(self, 
                          method='POST',
                          path='',
