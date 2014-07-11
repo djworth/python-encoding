@@ -1,6 +1,7 @@
-This is a python library for working with encoding.com.  
-
-This is still a work in progress but what has been implemented should work.
+#  python-encoding                                                                                                                                                     
+ 
+  
+This package contains a python library for working with encoding.com.  
 
 Example usage:
 
