@@ -1,38 +1,25 @@
 #  python-encoding                                                                                                                                                     
  
   
-This package contains a python library for working with encoding.com.  
+This package contains a python library for working with the Encoding.com RESTful API.  
+The current version supports making requests using xml/json data encoding formats.
 
 Example usage:
 
+import os
+import pprint
+import encodingapi
+            
+r_format = 'json'
+encoding_instance = encodingapi.Encoding(
+                                         user_id=os.getenv('ENCODING_API_USER_ID',None),
+                                         user_key=os.getenv('ENCODING_API_USER_KEY',None),
+                                         request_format=r_format
+                                        )
 
-import encoding
+result = encoding_instance.get_user_info()
 
-ENCODING_USERID = '1234'
-ENCODING_USERKEY = 'ABC123'
-
-
-MEDIA_IN_S3 = 's3://<aws_access_key>:<aws_secret>@s3.amazonaws.com/<bucket_name>/<key>'
-
-FORMAT = {  'output':'vp6_flix',
-            'vp6_profile':'2',
-            'file_extension':'flv',
-            'upct':'90', 
-            'size':'0x480',
-            'bitrate':'256k',
-            'audio_bitrate':'64k',
-            'audio_sample_rate':'44100',
-            'audio_channels_number':'2',
-            'keyframe':'6', 
-            'two_pass':'yes',
-            'keep_aspect_ratio':'yes', 
-            'rotate':'def',
-            'kfinttype':'2',
-            'cxmode':'1'
-            }
-
-encoder = encoding.Encoding(ENCODING_USERID, ENC0DING_USERKEY)
-response = encoder.add_media(source=[MEDIA_IN_S3], formats=[FORMAT])
-
-print response
-
+if r_format == 'json':
+   pprint.pprint(result)
+elif r_format == 'xml':
+   pprint.pprint(etree.tostring(result))
