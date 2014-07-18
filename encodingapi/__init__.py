@@ -90,8 +90,8 @@ class Encoding(object):
 
         result = None
 
-        nodes = {   'userid':self.userid,
-                    'userkey':self.userkey,
+        nodes = {   'userid':self.user_id,
+                    'userkey':self.user_key,
                     'action':action,
                     'extended':extended,
                     'mediaid':','.join(ids),
@@ -118,8 +118,8 @@ class Encoding(object):
 
         result = None
 
-        nodes = {   'userid':self.userid,
-                    'userkey':self.userkey,
+        nodes = {   'userid':self.user_id,
+                    'userkey':self.user_key,
                     'action':action,
                     'source':source,
                     'notify':notify,
