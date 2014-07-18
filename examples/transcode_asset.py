@@ -14,7 +14,7 @@ if __name__ == '__main__':
     #to transcode. if you do not have a json-encoded job file,
     #this example will not work
 
-    if os.path.exists(''):
+    if os.path.exists('./transcoding_job_json_dump.json'):
 
         encoding_instance = encodingapi.Encoding(
                                                  user_id=os.getenv('ENCODING_API_USER_ID',None),
