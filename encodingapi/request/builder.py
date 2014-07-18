@@ -16,6 +16,7 @@ class EncodingRequestBuilder(object):
 
     def build_request_object(self):
         
+        request_class = None
         request_object = None
 
         if self.__request_format_to_use == constants.ENCODING_API_XML_REQUEST_FORMAT:
