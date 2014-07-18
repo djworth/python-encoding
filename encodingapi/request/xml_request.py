@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import lxml
+import lxml.etree
 
 from encodingapi import constants
 from encodingapi.request import base

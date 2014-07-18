@@ -24,9 +24,14 @@ class Encoding(object):
         self.user_id = self.encoding_api_connection.user_id
         self.user_key = self.encoding_api_connection.user_key
         self.url = self.encoding_api_connection.url
+        self.request_format = request_format
         self.request_builder = builder.EncodingRequestBuilder(encoding_format=request_format)
 
         self.request_object, self.request_class = self.request_builder.build_request_object()
+
+    @property
+    def format(self):
+        return self.request_format
 
         
     def get_user_info(self, 
