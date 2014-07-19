@@ -6,20 +6,20 @@ The current version supports making requests using xml/json data encoding format
 
 Example usage:
 
-import os
-import pprint
-import encodingapi
+    import os
+    import pprint
+    import encodingapi
+    import lxml
+    from lxml import etree
             
-r_format = 'json'
-encoding_instance = encodingapi.Encoding(
-                                         user_id=os.getenv('ENCODING_API_USER_ID',None),
-                                         user_key=os.getenv('ENCODING_API_USER_KEY',None),
-                                         request_format=r_format
-                                        )
+    encoding_instance = encodingapi.Encoding(
+                                             user_id=os.getenv('ENCODING_API_USER_ID',None),
+                                             user_key=os.getenv('ENCODING_API_USER_KEY',None),
+                                            )
 
-result = encoding_instance.get_user_info()
+    result = encoding_instance.get_user_info()
 
-if r_format == 'json':
-   pprint.pprint(result)
-elif r_format == 'xml':
-   pprint.pprint(etree.tostring(result))
+    if encoding_instance.format == 'json':
+        pprint.pprint(result)
+    elif encoding_instance.format == 'xml':
+        pprint.pprint(etree.tostring(result))
