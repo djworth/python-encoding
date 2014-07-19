@@ -20,6 +20,6 @@ Example usage:
     result = encoding_instance.get_user_info()
 
     if encoding_instance.format == 'json':
-       pprint.pprint(result)
+        pprint.pprint(result)
     elif encoding_instance.format == 'xml':
         pprint.pprint(etree.tostring(result))
